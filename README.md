@@ -8,14 +8,15 @@ Deterministic <=4 KB Python 3.13 chess engine (`0x88` bit-compact search, Zobris
 
 ## Practice Gauntlet
 
-- Elo 1809 (5 wins, 1 draw, 0 losses, 485 spare plies)
-- `main.py` size: 4075 bytes
-- Gauntlet breakdown: G1-G5 checkmate wins (depth-2..4, nodes-100k..250k), G6 draw vs nodes-500k
-- Latency: avg 2517 ms/move, max 5745 ms/move (wall 847.4 s, deterministic SHA256 replay)
+- `main.py` size: `4093 bytes` (compressed from `src/engine.py` `8376 bytes` via `makefun compress`)
+- Practice gauntlet (`16 wins, 1 draw, 1 loss` across 18 games, mean Elo `1858`, peak Elo `2112`):
+  - `trial-0`: Elo `1809` (`5W-1D-0L`, `479` spare plies, wall `595.03s` / `715.04s`, 100% deterministic across 2 runs; beats `nodes-500k`)
+  - `trial-1`: Elo `2112` (`6W-0D-0L`, 6/6 checkmates including `nodes-500k`, `561` spare plies, wall `727.14s`)
+  - `trial-2`: Elo `1654` (`5W-0D-1L`, 5 checkmates, `563` spare plies, wall `544.94s`)
 
 ## Architecture
 
-The core leverages an alpha-beta negamax loop enhanced by iterative deepening and selective capture extensions to stabilize horizon evaluations. Move candidates are prioritized through historical cutoff heuristics and lightweight piece-square tables packed into minimalist bitwise arrays.
+`0x88` board + 64-bit bitboard occupancy/pawn masks (`P, O`), incremental PST + Zobrist hashing, PVS alpha-beta with TT, null-move, LMR, razoring, futility, SEE-guarded capture sorting, and endgame mop-up.
 
 ## Run it
 
